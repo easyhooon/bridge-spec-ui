@@ -171,20 +171,32 @@ function OperationMethod({ direction }: { direction: BridgeDirection }) {
   )
 }
 
-function ChevronIcon({ isOpen }: { isOpen: boolean }) {
+function ChevronIcon({
+  isOpen,
+  className = "bsu-chevron",
+}: {
+  isOpen: boolean
+  className?: string
+}) {
   return (
-    <span className="bsu-chevron" aria-hidden="true">
-      {isOpen ? "▲" : "▼"}
-    </span>
+    <svg
+      aria-hidden="true"
+      className={className}
+      fill="none"
+      viewBox="0 0 20 20">
+      <path
+        d={isOpen ? "M5 12.5L10 7.5L15 12.5" : "M5 7.5L10 12.5L15 7.5"}
+        stroke="currentColor"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth="1.8"
+      />
+    </svg>
   )
 }
 
 function SchemaChevronIcon({ isOpen }: { isOpen: boolean }) {
-  return (
-    <span className="bsu-schema-chevron" aria-hidden="true">
-      {isOpen ? "▾" : "▸"}
-    </span>
-  )
+  return <ChevronIcon className="bsu-schema-chevron" isOpen={isOpen} />
 }
 
 type JsonSchemaRecord = Record<string, unknown>

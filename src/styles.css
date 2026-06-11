@@ -286,8 +286,9 @@ body {
 
 .bsu-chevron {
   flex-shrink: 0;
+  width: 20px;
+  height: 20px;
   color: #475569;
-  font-size: 12px;
 }
 
 .bsu-operation-body {
@@ -594,6 +595,9 @@ body {
 }
 
 .bsu-schema-chevron {
+  flex-shrink: 0;
+  width: 14px;
+  height: 14px;
   color: #333;
 }
 
