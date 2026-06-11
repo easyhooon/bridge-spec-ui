@@ -7,7 +7,32 @@ runtime, mock native behavior, themes, routes, and handler implementation. This
 package gives you a small source-of-truth API for bridge specs and a React UI
 that can render those specs.
 
-## Install
+## Development
+
+Clone the repository and install npm dependencies first:
+
+```bash
+git clone https://github.com/easyhooon/bridge-spec-ui.git
+cd bridge-spec-ui
+pnpm install
+```
+
+Start the sample app:
+
+```bash
+pnpm dev
+```
+
+Open the URL printed by Vite. It is usually:
+
+```txt
+http://localhost:5173/
+```
+
+If port `5173` is already in use, Vite will print another local URL. Use that
+URL instead.
+
+## Package Installation
 
 BridgeSpec UI is not published to npm yet.
 
@@ -15,14 +40,6 @@ After the first package release, install it from npm:
 
 ```bash
 pnpm add bridge-spec-ui zod
-```
-
-If you are inside this repository and want to run the sample app, do not run
-`pnpm add bridge-spec-ui`. Install this repository's dependencies instead:
-
-```bash
-pnpm install
-pnpm dev
 ```
 
 To try the package from another local app before publishing, build and pack it
@@ -120,23 +137,12 @@ The local demo app shows a production-shaped integration:
 
 ### Run the Sample App
 
-Clone the repository, install dependencies, and start the Vite dev server:
+Install dependencies and start the Vite dev server:
 
 ```bash
-git clone https://github.com/easyhooon/bridge-spec-ui.git
-cd bridge-spec-ui
 pnpm install
 pnpm dev
 ```
-
-Open the URL printed by Vite. It is usually:
-
-```txt
-http://localhost:5173/
-```
-
-If port `5173` is already in use, Vite will print another local URL. Use that
-URL instead.
 
 The sample app is intentionally heavier than a minimal example. Good things to
 try after opening it:
