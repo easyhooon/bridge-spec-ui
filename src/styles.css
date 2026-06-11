@@ -285,10 +285,15 @@ body {
 }
 
 .bsu-chevron {
+  display: inline-block;
   flex-shrink: 0;
   width: 20px;
   height: 20px;
+  background-color: currentColor;
   color: #475569;
+  mask-position: center;
+  mask-repeat: no-repeat;
+  mask-size: contain;
 }
 
 .bsu-operation-body {
@@ -595,10 +600,15 @@ body {
 }
 
 .bsu-schema-chevron {
+  display: inline-block;
   flex-shrink: 0;
   width: 20px;
   height: 20px;
+  background-color: currentColor;
   color: #333;
+  mask-position: center;
+  mask-repeat: no-repeat;
+  mask-size: contain;
 }
 
 .bsu-schema-type {

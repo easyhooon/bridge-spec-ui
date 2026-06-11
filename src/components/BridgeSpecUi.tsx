@@ -1,4 +1,6 @@
 import { useEffect, useMemo, useState } from "react"
+import arrowDownIconUrl from "../assets/icons/ic_arrow_down_20.svg"
+import arrowUpIconUrl from "../assets/icons/ic_arrow_up_20.svg"
 import {
   bridgeRequestSchemaToJson,
   bridgeResponseSchemaToJson,
@@ -15,7 +17,7 @@ import type {
   BridgeSpecUiProps,
   BridgeTryResult,
 } from "../core/types"
-import type { ReactNode } from "react"
+import type { CSSProperties, ReactNode } from "react"
 
 type DirectionFilter = BridgeDirection | "all"
 
@@ -178,21 +180,18 @@ function ChevronIcon({
   isOpen: boolean
   className?: string
 }) {
+  const iconUrl = isOpen ? arrowUpIconUrl : arrowDownIconUrl
+  const style = {
+    WebkitMaskImage: `url(${iconUrl})`,
+    maskImage: `url(${iconUrl})`,
+  } satisfies CSSProperties
+
   return (
-    <svg
+    <span
       aria-hidden="true"
       className={className}
-      fill="none"
-      viewBox="0 0 20 20">
-      <path
-        d={
-          isOpen
-            ? "M9.64648 7.14648C9.84175 6.95122 10.1583 6.95122 10.3535 7.14648L15.3535 12.1465L14.6465 12.8535L10 8.20703L5.35352 12.8535L4.64648 12.1465L9.64648 7.14648Z"
-            : "M15.3535 7.85352L10.3535 12.8535C10.1583 13.0488 9.84175 13.0488 9.64648 12.8535L4.64648 7.85352L5.35352 7.14648L10 11.793L14.6465 7.14648L15.3535 7.85352Z"
-        }
-        fill="currentColor"
-      />
-    </svg>
+      style={style}
+    />
   )
 }
 
