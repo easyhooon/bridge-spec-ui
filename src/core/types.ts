@@ -37,6 +37,8 @@ export type BridgeSpec<TData = unknown, TResult = unknown> = {
   invoke?: BridgeInvoke<TData, TResult>
 }
 
+// Intentional type erasure for heterogeneous bridge lists.
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type AnyBridgeSpec = BridgeSpec<any, any>
 
 export type DefineBridgeInput<TData = unknown, TResult = unknown> = {
