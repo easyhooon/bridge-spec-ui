@@ -81,12 +81,14 @@ function App() {
 
 ## Sample App
 
-The local demo app shows a more complete integration:
+The local demo app shows a production-shaped integration:
 
 - Web -> App and App -> Web bridge specs
 - Android/iOS platform switching
-- mock native state controls
-- permission and sync examples
+- mock native state controls for app, device, network, permissions, secure
+  storage, push, and checkout scenarios
+- permission, secure storage, native UI, navigation, commerce, sync, push, and
+  lifecycle examples
 - mock-only and disabled Try it out policies
 
 ```bash

@@ -722,6 +722,34 @@ body {
   outline: none;
 }
 
+.demo-field select {
+  min-width: 0;
+  border: 0;
+  border-top: 1px solid #eef2f7;
+  background: #fff;
+  padding-top: 6px;
+  color: #0f172a;
+  font: inherit;
+  font-size: 13px;
+  outline: none;
+}
+
+.demo-section {
+  display: grid;
+  gap: 8px;
+}
+
+.demo-section h3 {
+  margin: 0;
+  color: #172033;
+  font-size: 13px;
+  line-height: 1.35;
+}
+
+.demo-native-grid-compact {
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+}
+
 .demo-toggle {
   display: flex;
   align-items: center;

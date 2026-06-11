@@ -5,7 +5,9 @@ import {
   createDemoRunner,
   defaultDemoNativeState,
   demoBridges,
+  demoTagOrder,
   type DemoNativeState,
+  type DemoPermissionName,
 } from "./demo/bridges"
 import type { BridgePlatform } from "./core"
 import "./styles.css"
@@ -31,6 +33,93 @@ function Toggle({
   )
 }
 
+function DemoField({
+  label,
+  onChange,
+  type = "text",
+  value,
+}: {
+  label: string
+  onChange: (value: string) => void
+  type?: "number" | "text"
+  value: number | string
+}) {
+  return (
+    <label className="demo-field">
+      {label}
+      <input
+        type={type}
+        value={value}
+        onChange={(event) => onChange(event.target.value)}
+      />
+    </label>
+  )
+}
+
+function DemoSelect<TValue extends string>({
+  label,
+  onChange,
+  options,
+  value,
+}: {
+  label: string
+  onChange: (value: TValue) => void
+  options: readonly TValue[]
+  value: TValue
+}) {
+  return (
+    <label className="demo-field">
+      {label}
+      <select value={value} onChange={(event) => onChange(event.target.value as TValue)}>
+        {options.map((option) => (
+          <option key={option} value={option}>
+            {option}
+          </option>
+        ))}
+      </select>
+    </label>
+  )
+}
+
+function PermissionToggles({
+  nativeState,
+  setNativeState,
+}: {
+  nativeState: DemoNativeState
+  setNativeState: (updater: (current: DemoNativeState) => DemoNativeState) => void
+}) {
+  const setPermission = (name: DemoPermissionName, checked: boolean) => {
+    setNativeState((current) => ({
+      ...current,
+      permissions: {
+        ...current.permissions,
+        [name]: checked,
+      },
+    }))
+  }
+
+  return (
+    <>
+      {(
+        [
+          "notifications",
+          "camera",
+          "location",
+          "contacts",
+          "biometrics",
+        ] as const
+      ).map((permissionName) => (
+        <Toggle
+          checked={nativeState.permissions[permissionName]}
+          key={permissionName}
+          label={permissionName}
+          onChange={(checked) => setPermission(permissionName, checked)}
+        />
+      ))}
+    </>
+  )
+}
+
 function SampleNativePanel({
   nativeState,
   selectedPlatform,
@@ -42,97 +131,302 @@ function SampleNativePanel({
   setNativeState: (updater: (current: DemoNativeState) => DemoNativeState) => void
   visibleBridgeCount: number
 }) {
-  const setPermission = (
-    name: keyof DemoNativeState["permissions"],
-    checked: boolean,
-  ) => {
-    setNativeState((current) => ({
-      ...current,
-      permissions: {
-        ...current.permissions,
-        [name]: checked,
-      },
-    }))
-  }
+  const platformProfile =
+    selectedPlatform === "ios"
+      ? nativeState.platforms.ios
+      : nativeState.platforms.android
 
   return (
     <section className="demo-native-panel">
       <div className="demo-native-summary">
         <strong>{selectedPlatform === "android" ? "Android" : "iOS"} host</strong>
         <span>{visibleBridgeCount} visible bridge specs</span>
-        <span>App {nativeState.appVersion}</span>
-        <span>OS {selectedPlatform === "android" ? nativeState.osVersion : "18.2"}</span>
+        <span>App {nativeState.app.version}</span>
+        <span>Build {nativeState.app.buildNumber}</span>
+        <span>{platformProfile.modelName}</span>
+        <span>{nativeState.network.online ? nativeState.network.type : "offline"}</span>
       </div>
 
-      <div className="demo-native-grid">
-        <label className="demo-field">
-          App version
-          <input
-            value={nativeState.appVersion}
-            onChange={(event) =>
+      <section className="demo-section">
+        <h3>App and Device</h3>
+        <div className="demo-native-grid">
+          <DemoField
+            label="App version"
+            value={nativeState.app.version}
+            onChange={(value) =>
               setNativeState((current) => ({
                 ...current,
-                appVersion: event.target.value,
+                app: { ...current.app, version: value },
               }))
             }
           />
-        </label>
-        <label className="demo-field">
-          Android OS version
-          <input
-            value={nativeState.osVersion}
-            onChange={(event) =>
+          <DemoField
+            label="Build number"
+            value={nativeState.app.buildNumber}
+            onChange={(value) =>
               setNativeState((current) => ({
                 ...current,
-                osVersion: event.target.value,
+                app: { ...current.app, buildNumber: value },
               }))
             }
           />
-        </label>
-        <label className="demo-field">
-          Device ID
-          <input
-            value={nativeState.deviceId}
-            onChange={(event) =>
+          <DemoSelect
+            label="Environment"
+            options={["development", "staging", "production"] as const}
+            value={nativeState.app.environment}
+            onChange={(value) =>
               setNativeState((current) => ({
                 ...current,
-                deviceId: event.target.value,
+                app: { ...current.app, environment: value },
               }))
             }
           />
-        </label>
-      </div>
+          <DemoSelect
+            label="Theme"
+            options={["system", "light", "dark"] as const}
+            value={nativeState.device.theme}
+            onChange={(value) =>
+              setNativeState((current) => ({
+                ...current,
+                device: { ...current.device, theme: value },
+              }))
+            }
+          />
+          <DemoField
+            label="Device ID"
+            value={nativeState.device.id}
+            onChange={(value) =>
+              setNativeState((current) => ({
+                ...current,
+                device: { ...current.device, id: value },
+              }))
+            }
+          />
+          <DemoField
+            label="Locale"
+            value={nativeState.device.locale}
+            onChange={(value) =>
+              setNativeState((current) => ({
+                ...current,
+                device: { ...current.device, locale: value },
+              }))
+            }
+          />
+          <DemoField
+            label="Timezone"
+            value={nativeState.device.timezone}
+            onChange={(value) =>
+              setNativeState((current) => ({
+                ...current,
+                device: { ...current.device, timezone: value },
+              }))
+            }
+          />
+          <DemoField
+            label="Battery"
+            type="number"
+            value={nativeState.device.batteryLevel}
+            onChange={(value) =>
+              setNativeState((current) => ({
+                ...current,
+                device: {
+                  ...current.device,
+                  batteryLevel: Number(value),
+                },
+              }))
+            }
+          />
+        </div>
+      </section>
 
-      <div className="demo-native-grid">
-        <Toggle
-          checked={nativeState.permissions.notifications}
-          label="Notifications"
-          onChange={(checked) => setPermission("notifications", checked)}
-        />
-        <Toggle
-          checked={nativeState.permissions.camera}
-          label="Camera"
-          onChange={(checked) => setPermission("camera", checked)}
-        />
-        <Toggle
-          checked={nativeState.permissions.location}
-          label="Location"
-          onChange={(checked) => setPermission("location", checked)}
-        />
-        <Toggle
-          checked={nativeState.sync.online}
-          label="Native online"
-          onChange={(checked) =>
-            setNativeState((current) => ({
-              ...current,
-              sync: {
-                ...current.sync,
-                online: checked,
-              },
-            }))
-          }
-        />
-      </div>
+      <section className="demo-section">
+        <h3>Platform Profiles</h3>
+        <div className="demo-native-grid">
+          <DemoField
+            label="Android OS"
+            value={nativeState.platforms.android.osVersion}
+            onChange={(value) =>
+              setNativeState((current) => ({
+                ...current,
+                platforms: {
+                  ...current.platforms,
+                  android: {
+                    ...current.platforms.android,
+                    osVersion: value,
+                  },
+                },
+              }))
+            }
+          />
+          <DemoField
+            label="Android model"
+            value={nativeState.platforms.android.modelName}
+            onChange={(value) =>
+              setNativeState((current) => ({
+                ...current,
+                platforms: {
+                  ...current.platforms,
+                  android: {
+                    ...current.platforms.android,
+                    modelName: value,
+                  },
+                },
+              }))
+            }
+          />
+          <DemoField
+            label="iOS version"
+            value={nativeState.platforms.ios.osVersion}
+            onChange={(value) =>
+              setNativeState((current) => ({
+                ...current,
+                platforms: {
+                  ...current.platforms,
+                  ios: {
+                    ...current.platforms.ios,
+                    osVersion: value,
+                  },
+                },
+              }))
+            }
+          />
+          <DemoField
+            label="iOS model"
+            value={nativeState.platforms.ios.modelName}
+            onChange={(value) =>
+              setNativeState((current) => ({
+                ...current,
+                platforms: {
+                  ...current.platforms,
+                  ios: {
+                    ...current.platforms.ios,
+                    modelName: value,
+                  },
+                },
+              }))
+            }
+          />
+        </div>
+      </section>
+
+      <section className="demo-section">
+        <h3>Native State</h3>
+        <div className="demo-native-grid demo-native-grid-compact">
+          <PermissionToggles
+            nativeState={nativeState}
+            setNativeState={setNativeState}
+          />
+          <Toggle
+            checked={nativeState.network.online}
+            label="network online"
+            onChange={(checked) =>
+              setNativeState((current) => ({
+                ...current,
+                network: {
+                  ...current.network,
+                  online: checked,
+                  type: checked ? current.network.type === "offline" ? "wifi" : current.network.type : "offline",
+                },
+              }))
+            }
+          />
+          <Toggle
+            checked={nativeState.account.signedIn}
+            label="signed in"
+            onChange={(checked) =>
+              setNativeState((current) => ({
+                ...current,
+                account: { ...current.account, signedIn: checked },
+              }))
+            }
+          />
+          <Toggle
+            checked={nativeState.account.biometricsEnrolled}
+            label="biometrics enrolled"
+            onChange={(checked) =>
+              setNativeState((current) => ({
+                ...current,
+                account: { ...current.account, biometricsEnrolled: checked },
+              }))
+            }
+          />
+          <Toggle
+            checked={nativeState.push.enabled}
+            label="push enabled"
+            onChange={(checked) =>
+              setNativeState((current) => ({
+                ...current,
+                push: { ...current.push, enabled: checked },
+              }))
+            }
+          />
+          <Toggle
+            checked={nativeState.checkout.canPay}
+            label="checkout can pay"
+            onChange={(checked) =>
+              setNativeState((current) => ({
+                ...current,
+                checkout: { ...current.checkout, canPay: checked },
+              }))
+            }
+          />
+        </div>
+      </section>
+
+      <section className="demo-section">
+        <h3>Network, Sync, and Tokens</h3>
+        <div className="demo-native-grid">
+          <DemoSelect
+            label="Network type"
+            options={["wifi", "cellular", "offline"] as const}
+            value={nativeState.network.type}
+            onChange={(value) =>
+              setNativeState((current) => ({
+                ...current,
+                network: {
+                  ...current.network,
+                  type: value,
+                  online: value !== "offline",
+                },
+              }))
+            }
+          />
+          <DemoField
+            label="Queued records"
+            type="number"
+            value={nativeState.sync.queuedRecords}
+            onChange={(value) =>
+              setNativeState((current) => ({
+                ...current,
+                sync: { ...current.sync, queuedRecords: Number(value) },
+              }))
+            }
+          />
+          <DemoField
+            label="Push token"
+            value={nativeState.push.token}
+            onChange={(value) =>
+              setNativeState((current) => ({
+                ...current,
+                push: { ...current.push, token: value },
+              }))
+            }
+          />
+          <DemoField
+            label="Last transaction"
+            value={nativeState.checkout.lastTransactionId}
+            onChange={(value) =>
+              setNativeState((current) => ({
+                ...current,
+                checkout: {
+                  ...current.checkout,
+                  lastTransactionId: value,
+                },
+              }))
+            }
+          />
+        </div>
+      </section>
 
       <div className="demo-actions">
         <button
@@ -161,7 +455,7 @@ function DemoApp() {
       title="Example WebView Bridge"
       version="0.0.0"
       brandName="BridgeSpec UI"
-      description="A sample bridge console with mock native state, schema-driven docs, and Try it out execution."
+      description="A production-shaped sample bridge console with mock native state, schema-driven docs, and Try it out execution."
       bridges={demoBridges}
       platform={platform}
       platformOptions={[
@@ -170,14 +464,7 @@ function DemoApp() {
       ]}
       runBridge={demoRunner}
       onPlatformChange={setPlatform}
-      tagOrder={[
-        "App Info / Version",
-        "Permissions",
-        "Navigation",
-        "Native UI",
-        "Sync Events",
-        "Danger Zone",
-      ]}
+      tagOrder={demoTagOrder}
       renderEnvironmentPanel={({ selectedPlatform, visibleBridges }) => (
         <SampleNativePanel
           nativeState={nativeState}
