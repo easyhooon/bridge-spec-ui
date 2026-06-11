@@ -20,8 +20,10 @@ import {
   BridgeSpecUi,
   defineWebToAppBridge,
   type BridgeTryResult,
+  type BridgePlatform,
 } from "bridge-spec-ui"
 import "bridge-spec-ui/styles.css"
+import { useState } from "react"
 import { z } from "zod"
 
 const getNativeAppVersion = defineWebToAppBridge({
@@ -46,10 +48,18 @@ const getNativeAppVersion = defineWebToAppBridge({
 })
 
 function App() {
+  const [platform, setPlatform] = useState<BridgePlatform>("android")
+
   return (
     <BridgeSpecUi
       title="Example WebView Bridge"
       bridges={[getNativeAppVersion]}
+      platform={platform}
+      platformOptions={[
+        { label: "Android WebView", value: "android" },
+        { label: "iOS WebView", value: "ios" },
+      ]}
+      onPlatformChange={setPlatform}
       runBridge={async ({ bridge, data }) => {
         if (!bridge.invoke) {
           return {
@@ -67,6 +77,21 @@ function App() {
     />
   )
 }
+```
+
+## Sample App
+
+The local demo app shows a more complete integration:
+
+- Web -> App and App -> Web bridge specs
+- Android/iOS platform switching
+- mock native state controls
+- permission and sync examples
+- mock-only and disabled Try it out policies
+
+```bash
+pnpm install
+pnpm dev
 ```
 
 ## Design Notes
