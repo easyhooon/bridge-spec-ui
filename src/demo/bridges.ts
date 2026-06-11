@@ -425,7 +425,7 @@ export const demoBridges = [
     request: z.object({
       title: z.string().optional(),
       text: z.string().min(1),
-      url: z.string().url().optional(),
+      url: z.url().optional(),
     }),
     response: z.object({
       completed: z.boolean(),
@@ -454,7 +454,7 @@ export const demoBridges = [
     tags: ["Navigation"],
     platforms: ["android", "ios"],
     request: z.object({
-      url: z.string().url(),
+      url: z.url(),
       presentation: z.enum(["browser", "in-app"]).default("browser"),
     }),
     response: z.object({
@@ -580,7 +580,7 @@ export const demoBridges = [
     request: z.object({
       notificationId: z.string(),
       title: z.string(),
-      deepLink: z.string().url().optional(),
+      deepLink: z.url().optional(),
       data: z.record(z.string(), z.string()).optional(),
     }),
     response: z.object({
@@ -609,7 +609,7 @@ export const demoBridges = [
     tags: ["Navigation"],
     platforms: ["android", "ios"],
     request: z.object({
-      url: z.string().url(),
+      url: z.url(),
       source: z.enum(["push", "universal-link", "custom-scheme"]),
     }),
     response: z.object({
