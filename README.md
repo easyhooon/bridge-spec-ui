@@ -9,8 +9,35 @@ that can render those specs.
 
 ## Install
 
+BridgeSpec UI is not published to npm yet.
+
+After the first package release, install it from npm:
+
 ```bash
 pnpm add bridge-spec-ui zod
+```
+
+If you are inside this repository and want to run the sample app, do not run
+`pnpm add bridge-spec-ui`. Install this repository's dependencies instead:
+
+```bash
+pnpm install
+pnpm dev
+```
+
+To try the package from another local app before publishing, build and pack it
+from this repository:
+
+```bash
+pnpm install
+pnpm build
+pnpm pack --pack-destination /tmp
+```
+
+Then install the generated tarball from the other app:
+
+```bash
+pnpm add /tmp/bridge-spec-ui-0.0.0.tgz zod
 ```
 
 ## Quick Start
