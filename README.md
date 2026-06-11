@@ -17,6 +17,8 @@ cd bridge-spec-ui
 pnpm install
 ```
 
+`pnpm install` also installs local git hooks through Lefthook.
+
 Start the sample app:
 
 ```bash
@@ -31,6 +33,22 @@ http://localhost:5173/
 
 If port `5173` is already in use, Vite will print another local URL. Use that
 URL instead.
+
+### Local Checks
+
+The repository uses local-only git hooks:
+
+- `pre-commit`: formats and lints staged JS/TS/CSS/JSON/Markdown/YAML files
+- `pre-push`: runs `pnpm typecheck` and `pnpm build`
+
+You can also run the checks manually:
+
+```bash
+pnpm format:check
+pnpm lint
+pnpm typecheck
+pnpm build
+```
 
 ## Package Installation
 
