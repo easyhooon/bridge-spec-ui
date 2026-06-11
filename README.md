@@ -91,9 +91,47 @@ The local demo app shows a production-shaped integration:
   lifecycle examples
 - mock-only and disabled Try it out policies
 
+### Run the Sample App
+
+Clone the repository, install dependencies, and start the Vite dev server:
+
 ```bash
+git clone https://github.com/easyhooon/bridge-spec-ui.git
+cd bridge-spec-ui
 pnpm install
 pnpm dev
+```
+
+Open the URL printed by Vite. It is usually:
+
+```txt
+http://localhost:5173/
+```
+
+If port `5173` is already in use, Vite will print another local URL. Use that
+URL instead.
+
+The sample app is intentionally heavier than a minimal example. Good things to
+try after opening it:
+
+- switch between Android WebView and iOS WebView mock hosts
+- change app, device, network, permission, secure storage, push, and checkout
+  state in the mock native panel
+- filter bridge specs by handler name, title, summary, or tag
+- expand bridge cards to inspect request schemas, response schemas, examples,
+  and Try it out behavior
+- run Web -> App examples and compare the response payload against the current
+  mock native state
+- inspect disabled and mock-only bridge cases to see how production apps can
+  document unsupported or app-driven flows
+
+### Validate a Local Build
+
+Run these before publishing or opening a pull request:
+
+```bash
+pnpm typecheck
+pnpm build
 ```
 
 ## Design Notes
