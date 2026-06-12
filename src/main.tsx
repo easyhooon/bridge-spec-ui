@@ -70,7 +70,9 @@ function DemoSelect<TValue extends string>({
   return (
     <label className="demo-field">
       {label}
-      <select value={value} onChange={(event) => onChange(event.target.value as TValue)}>
+      <select
+        value={value}
+        onChange={(event) => onChange(event.target.value as TValue)}>
         {options.map((option) => (
           <option key={option} value={option}>
             {option}
@@ -81,42 +83,376 @@ function DemoSelect<TValue extends string>({
   )
 }
 
-function PermissionToggles({
+type DemoNativeField =
+  | {
+      key: string
+      label: string
+      type: "boolean"
+      fullWidth?: boolean
+      value: (state: DemoNativeState) => boolean
+      update: (state: DemoNativeState, value: boolean) => DemoNativeState
+    }
+  | {
+      key: string
+      label: string
+      type: "number" | "text"
+      fullWidth?: boolean
+      value: (state: DemoNativeState) => number | string
+      update: (state: DemoNativeState, value: string) => DemoNativeState
+    }
+  | {
+      key: string
+      label: string
+      type: "select"
+      fullWidth?: boolean
+      options: readonly string[]
+      value: (state: DemoNativeState) => string
+      update: (state: DemoNativeState, value: string) => DemoNativeState
+    }
+
+type DemoNativeFieldSection = {
+  compact?: boolean
+  fields: readonly DemoNativeField[]
+  title: string
+}
+
+const demoPermissionNames = [
+  "notifications",
+  "camera",
+  "location",
+  "contacts",
+  "biometrics",
+] as const satisfies readonly DemoPermissionName[]
+
+const demoNativeFieldSections: readonly DemoNativeFieldSection[] = [
+  {
+    title: "App and Device",
+    fields: [
+      {
+        key: "app.version",
+        label: "App version",
+        type: "text",
+        value: (state) => state.app.version,
+        update: (state, value) => ({
+          ...state,
+          app: { ...state.app, version: value },
+        }),
+      },
+      {
+        key: "app.buildNumber",
+        label: "Build number",
+        type: "text",
+        value: (state) => state.app.buildNumber,
+        update: (state, value) => ({
+          ...state,
+          app: { ...state.app, buildNumber: value },
+        }),
+      },
+      {
+        key: "app.environment",
+        label: "Environment",
+        type: "select",
+        options: ["development", "staging", "production"],
+        value: (state) => state.app.environment,
+        update: (state, value) => ({
+          ...state,
+          app: {
+            ...state.app,
+            environment: value as DemoNativeState["app"]["environment"],
+          },
+        }),
+      },
+      {
+        key: "device.theme",
+        label: "Theme",
+        type: "select",
+        options: ["system", "light", "dark"],
+        value: (state) => state.device.theme,
+        update: (state, value) => ({
+          ...state,
+          device: {
+            ...state.device,
+            theme: value as DemoNativeState["device"]["theme"],
+          },
+        }),
+      },
+      {
+        key: "device.id",
+        label: "Device ID",
+        type: "text",
+        value: (state) => state.device.id,
+        update: (state, value) => ({
+          ...state,
+          device: { ...state.device, id: value },
+        }),
+      },
+      {
+        key: "device.locale",
+        label: "Locale",
+        type: "text",
+        value: (state) => state.device.locale,
+        update: (state, value) => ({
+          ...state,
+          device: { ...state.device, locale: value },
+        }),
+      },
+      {
+        key: "device.timezone",
+        label: "Timezone",
+        type: "text",
+        value: (state) => state.device.timezone,
+        update: (state, value) => ({
+          ...state,
+          device: { ...state.device, timezone: value },
+        }),
+      },
+      {
+        key: "device.batteryLevel",
+        label: "Battery",
+        type: "number",
+        value: (state) => state.device.batteryLevel,
+        update: (state, value) => ({
+          ...state,
+          device: { ...state.device, batteryLevel: Number(value) },
+        }),
+      },
+    ],
+  },
+  {
+    title: "Platform Profiles",
+    fields: [
+      {
+        key: "platforms.android.osVersion",
+        label: "Android OS",
+        type: "text",
+        value: (state) => state.platforms.android.osVersion,
+        update: (state, value) => ({
+          ...state,
+          platforms: {
+            ...state.platforms,
+            android: { ...state.platforms.android, osVersion: value },
+          },
+        }),
+      },
+      {
+        key: "platforms.android.modelName",
+        label: "Android model",
+        type: "text",
+        value: (state) => state.platforms.android.modelName,
+        update: (state, value) => ({
+          ...state,
+          platforms: {
+            ...state.platforms,
+            android: { ...state.platforms.android, modelName: value },
+          },
+        }),
+      },
+      {
+        key: "platforms.ios.osVersion",
+        label: "iOS version",
+        type: "text",
+        value: (state) => state.platforms.ios.osVersion,
+        update: (state, value) => ({
+          ...state,
+          platforms: {
+            ...state.platforms,
+            ios: { ...state.platforms.ios, osVersion: value },
+          },
+        }),
+      },
+      {
+        key: "platforms.ios.modelName",
+        label: "iOS model",
+        type: "text",
+        value: (state) => state.platforms.ios.modelName,
+        update: (state, value) => ({
+          ...state,
+          platforms: {
+            ...state.platforms,
+            ios: { ...state.platforms.ios, modelName: value },
+          },
+        }),
+      },
+    ],
+  },
+  {
+    compact: true,
+    title: "Native State",
+    fields: [
+      ...demoPermissionNames.map(
+        (permissionName): DemoNativeField => ({
+          key: `permissions.${permissionName}`,
+          label: permissionName,
+          type: "boolean",
+          value: (state) => state.permissions[permissionName],
+          update: (state, value) => ({
+            ...state,
+            permissions: {
+              ...state.permissions,
+              [permissionName]: value,
+            },
+          }),
+        }),
+      ),
+      {
+        key: "network.online",
+        label: "network online",
+        type: "boolean",
+        value: (state) => state.network.online,
+        update: (state, value) => ({
+          ...state,
+          network: {
+            ...state.network,
+            online: value,
+            type: value
+              ? state.network.type === "offline"
+                ? "wifi"
+                : state.network.type
+              : "offline",
+          },
+        }),
+      },
+      {
+        key: "account.signedIn",
+        label: "signed in",
+        type: "boolean",
+        value: (state) => state.account.signedIn,
+        update: (state, value) => ({
+          ...state,
+          account: { ...state.account, signedIn: value },
+        }),
+      },
+      {
+        key: "account.biometricsEnrolled",
+        label: "biometrics enrolled",
+        type: "boolean",
+        value: (state) => state.account.biometricsEnrolled,
+        update: (state, value) => ({
+          ...state,
+          account: { ...state.account, biometricsEnrolled: value },
+        }),
+      },
+      {
+        key: "push.enabled",
+        label: "push enabled",
+        type: "boolean",
+        value: (state) => state.push.enabled,
+        update: (state, value) => ({
+          ...state,
+          push: { ...state.push, enabled: value },
+        }),
+      },
+      {
+        key: "checkout.canPay",
+        label: "checkout can pay",
+        type: "boolean",
+        value: (state) => state.checkout.canPay,
+        update: (state, value) => ({
+          ...state,
+          checkout: { ...state.checkout, canPay: value },
+        }),
+      },
+    ],
+  },
+  {
+    title: "Network, Sync, and Tokens",
+    fields: [
+      {
+        key: "network.type",
+        label: "Network type",
+        type: "select",
+        options: ["wifi", "cellular", "offline"],
+        value: (state) => state.network.type,
+        update: (state, value) => ({
+          ...state,
+          network: {
+            ...state.network,
+            type: value as DemoNativeState["network"]["type"],
+            online: value !== "offline",
+          },
+        }),
+      },
+      {
+        key: "sync.queuedRecords",
+        label: "Queued records",
+        type: "number",
+        value: (state) => state.sync.queuedRecords,
+        update: (state, value) => ({
+          ...state,
+          sync: { ...state.sync, queuedRecords: Number(value) },
+        }),
+      },
+      {
+        fullWidth: true,
+        key: "push.token",
+        label: "Push token",
+        type: "text",
+        value: (state) => state.push.token,
+        update: (state, value) => ({
+          ...state,
+          push: { ...state.push, token: value },
+        }),
+      },
+      {
+        key: "checkout.lastTransactionId",
+        label: "Last transaction",
+        type: "text",
+        value: (state) => state.checkout.lastTransactionId,
+        update: (state, value) => ({
+          ...state,
+          checkout: {
+            ...state.checkout,
+            lastTransactionId: value,
+          },
+        }),
+      },
+    ],
+  },
+]
+
+function DemoNativeConfigField({
+  field,
   nativeState,
   setNativeState,
 }: {
+  field: DemoNativeField
   nativeState: DemoNativeState
   setNativeState: (updater: (current: DemoNativeState) => DemoNativeState) => void
 }) {
-  const setPermission = (name: DemoPermissionName, checked: boolean) => {
-    setNativeState((current) => ({
-      ...current,
-      permissions: {
-        ...current.permissions,
-        [name]: checked,
-      },
-    }))
+  if (field.type === "boolean") {
+    return (
+      <Toggle
+        checked={field.value(nativeState)}
+        label={field.label}
+        onChange={(value) =>
+          setNativeState((current) => field.update(current, value))
+        }
+      />
+    )
+  }
+
+  if (field.type === "select") {
+    return (
+      <DemoSelect
+        label={field.label}
+        options={field.options}
+        value={field.value(nativeState)}
+        onChange={(value) =>
+          setNativeState((current) => field.update(current, value))
+        }
+      />
+    )
   }
 
   return (
-    <>
-      {(
-        [
-          "notifications",
-          "camera",
-          "location",
-          "contacts",
-          "biometrics",
-        ] as const
-      ).map((permissionName) => (
-        <Toggle
-          checked={nativeState.permissions[permissionName]}
-          key={permissionName}
-          label={permissionName}
-          onChange={(checked) => setPermission(permissionName, checked)}
-        />
-      ))}
-    </>
+    <DemoField
+      label={field.label}
+      type={field.type}
+      value={field.value(nativeState)}
+      onChange={(value) =>
+        setNativeState((current) => field.update(current, value))
+      }
+    />
   )
 }
 
@@ -139,294 +475,39 @@ function SampleNativePanel({
   return (
     <section className="demo-native-panel">
       <div className="demo-native-summary">
-        <strong>{selectedPlatform === "android" ? "Android" : "iOS"} host</strong>
+        <strong>
+          {selectedPlatform === "android" ? "Android" : "iOS"} host
+        </strong>
         <span>{visibleBridgeCount} visible bridge specs</span>
         <span>App {nativeState.app.version}</span>
         <span>Build {nativeState.app.buildNumber}</span>
         <span>{platformProfile.modelName}</span>
-        <span>{nativeState.network.online ? nativeState.network.type : "offline"}</span>
+        <span>
+          {nativeState.network.online ? nativeState.network.type : "offline"}
+        </span>
       </div>
 
-      <section className="demo-section">
-        <h3>App and Device</h3>
-        <div className="demo-native-grid">
-          <DemoField
-            label="App version"
-            value={nativeState.app.version}
-            onChange={(value) =>
-              setNativeState((current) => ({
-                ...current,
-                app: { ...current.app, version: value },
-              }))
-            }
-          />
-          <DemoField
-            label="Build number"
-            value={nativeState.app.buildNumber}
-            onChange={(value) =>
-              setNativeState((current) => ({
-                ...current,
-                app: { ...current.app, buildNumber: value },
-              }))
-            }
-          />
-          <DemoSelect
-            label="Environment"
-            options={["development", "staging", "production"] as const}
-            value={nativeState.app.environment}
-            onChange={(value) =>
-              setNativeState((current) => ({
-                ...current,
-                app: { ...current.app, environment: value },
-              }))
-            }
-          />
-          <DemoSelect
-            label="Theme"
-            options={["system", "light", "dark"] as const}
-            value={nativeState.device.theme}
-            onChange={(value) =>
-              setNativeState((current) => ({
-                ...current,
-                device: { ...current.device, theme: value },
-              }))
-            }
-          />
-          <DemoField
-            label="Device ID"
-            value={nativeState.device.id}
-            onChange={(value) =>
-              setNativeState((current) => ({
-                ...current,
-                device: { ...current.device, id: value },
-              }))
-            }
-          />
-          <DemoField
-            label="Locale"
-            value={nativeState.device.locale}
-            onChange={(value) =>
-              setNativeState((current) => ({
-                ...current,
-                device: { ...current.device, locale: value },
-              }))
-            }
-          />
-          <DemoField
-            label="Timezone"
-            value={nativeState.device.timezone}
-            onChange={(value) =>
-              setNativeState((current) => ({
-                ...current,
-                device: { ...current.device, timezone: value },
-              }))
-            }
-          />
-          <DemoField
-            label="Battery"
-            type="number"
-            value={nativeState.device.batteryLevel}
-            onChange={(value) =>
-              setNativeState((current) => ({
-                ...current,
-                device: {
-                  ...current.device,
-                  batteryLevel: Number(value),
-                },
-              }))
-            }
-          />
-        </div>
-      </section>
-
-      <section className="demo-section">
-        <h3>Platform Profiles</h3>
-        <div className="demo-native-grid">
-          <DemoField
-            label="Android OS"
-            value={nativeState.platforms.android.osVersion}
-            onChange={(value) =>
-              setNativeState((current) => ({
-                ...current,
-                platforms: {
-                  ...current.platforms,
-                  android: {
-                    ...current.platforms.android,
-                    osVersion: value,
-                  },
-                },
-              }))
-            }
-          />
-          <DemoField
-            label="Android model"
-            value={nativeState.platforms.android.modelName}
-            onChange={(value) =>
-              setNativeState((current) => ({
-                ...current,
-                platforms: {
-                  ...current.platforms,
-                  android: {
-                    ...current.platforms.android,
-                    modelName: value,
-                  },
-                },
-              }))
-            }
-          />
-          <DemoField
-            label="iOS version"
-            value={nativeState.platforms.ios.osVersion}
-            onChange={(value) =>
-              setNativeState((current) => ({
-                ...current,
-                platforms: {
-                  ...current.platforms,
-                  ios: {
-                    ...current.platforms.ios,
-                    osVersion: value,
-                  },
-                },
-              }))
-            }
-          />
-          <DemoField
-            label="iOS model"
-            value={nativeState.platforms.ios.modelName}
-            onChange={(value) =>
-              setNativeState((current) => ({
-                ...current,
-                platforms: {
-                  ...current.platforms,
-                  ios: {
-                    ...current.platforms.ios,
-                    modelName: value,
-                  },
-                },
-              }))
-            }
-          />
-        </div>
-      </section>
-
-      <section className="demo-section">
-        <h3>Native State</h3>
-        <div className="demo-native-grid demo-native-grid-compact">
-          <PermissionToggles
-            nativeState={nativeState}
-            setNativeState={setNativeState}
-          />
-          <Toggle
-            checked={nativeState.network.online}
-            label="network online"
-            onChange={(checked) =>
-              setNativeState((current) => ({
-                ...current,
-                network: {
-                  ...current.network,
-                  online: checked,
-                  type: checked ? current.network.type === "offline" ? "wifi" : current.network.type : "offline",
-                },
-              }))
-            }
-          />
-          <Toggle
-            checked={nativeState.account.signedIn}
-            label="signed in"
-            onChange={(checked) =>
-              setNativeState((current) => ({
-                ...current,
-                account: { ...current.account, signedIn: checked },
-              }))
-            }
-          />
-          <Toggle
-            checked={nativeState.account.biometricsEnrolled}
-            label="biometrics enrolled"
-            onChange={(checked) =>
-              setNativeState((current) => ({
-                ...current,
-                account: { ...current.account, biometricsEnrolled: checked },
-              }))
-            }
-          />
-          <Toggle
-            checked={nativeState.push.enabled}
-            label="push enabled"
-            onChange={(checked) =>
-              setNativeState((current) => ({
-                ...current,
-                push: { ...current.push, enabled: checked },
-              }))
-            }
-          />
-          <Toggle
-            checked={nativeState.checkout.canPay}
-            label="checkout can pay"
-            onChange={(checked) =>
-              setNativeState((current) => ({
-                ...current,
-                checkout: { ...current.checkout, canPay: checked },
-              }))
-            }
-          />
-        </div>
-      </section>
-
-      <section className="demo-section">
-        <h3>Network, Sync, and Tokens</h3>
-        <div className="demo-native-grid">
-          <DemoSelect
-            label="Network type"
-            options={["wifi", "cellular", "offline"] as const}
-            value={nativeState.network.type}
-            onChange={(value) =>
-              setNativeState((current) => ({
-                ...current,
-                network: {
-                  ...current.network,
-                  type: value,
-                  online: value !== "offline",
-                },
-              }))
-            }
-          />
-          <DemoField
-            label="Queued records"
-            type="number"
-            value={nativeState.sync.queuedRecords}
-            onChange={(value) =>
-              setNativeState((current) => ({
-                ...current,
-                sync: { ...current.sync, queuedRecords: Number(value) },
-              }))
-            }
-          />
-          <DemoField
-            label="Push token"
-            value={nativeState.push.token}
-            onChange={(value) =>
-              setNativeState((current) => ({
-                ...current,
-                push: { ...current.push, token: value },
-              }))
-            }
-          />
-          <DemoField
-            label="Last transaction"
-            value={nativeState.checkout.lastTransactionId}
-            onChange={(value) =>
-              setNativeState((current) => ({
-                ...current,
-                checkout: {
-                  ...current.checkout,
-                  lastTransactionId: value,
-                },
-              }))
-            }
-          />
-        </div>
-      </section>
+      {demoNativeFieldSections.map((section) => (
+        <section className="demo-section" key={section.title}>
+          <h3>{section.title}</h3>
+          <div
+            className={`demo-native-grid ${
+              section.compact ? "demo-native-grid-compact" : ""
+            }`}>
+            {section.fields.map((field) => (
+              <div
+                className={field.fullWidth ? "demo-native-grid-full" : ""}
+                key={field.key}>
+                <DemoNativeConfigField
+                  field={field}
+                  nativeState={nativeState}
+                  setNativeState={setNativeState}
+                />
+              </div>
+            ))}
+          </div>
+        </section>
+      ))}
 
       <div className="demo-actions">
         <button

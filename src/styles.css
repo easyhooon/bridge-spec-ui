@@ -805,6 +805,10 @@ body {
   grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
 }
 
+.demo-native-grid-full {
+  grid-column: 1 / -1;
+}
+
 .demo-toggle {
   display: flex;
   align-items: center;
