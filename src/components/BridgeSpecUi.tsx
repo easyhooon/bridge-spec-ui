@@ -963,7 +963,10 @@ export function BridgeSpecUi({
                 onChange={(value) => onPlatformChange(value as BridgePlatform)}
               />
             </label>
-            {renderEnvironmentPanel?.({ selectedPlatform: platform, visibleBridges: filteredSpecs })}
+            {renderEnvironmentPanel?.({
+              selectedPlatform: platform,
+              visibleBridges: filteredSpecs,
+            })}
           </div>
         </section>
 
