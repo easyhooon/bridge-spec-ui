@@ -1,6 +1,4 @@
 import { useEffect, useMemo, useState } from "react"
-import arrowDownIconUrl from "../assets/icons/ic_arrow_down_20.svg"
-import arrowUpIconUrl from "../assets/icons/ic_arrow_up_20.svg"
 import {
   bridgeRequestSchemaToJson,
   bridgeResponseSchemaToJson,
@@ -17,7 +15,7 @@ import type {
   BridgeSpecUiProps,
   BridgeTryResult,
 } from "../core/types"
-import type { CSSProperties, ReactNode } from "react"
+import type { ReactNode } from "react"
 
 type DirectionFilter = BridgeDirection | "all"
 
@@ -180,18 +178,14 @@ function ChevronIcon({
   isOpen: boolean
   className?: string
 }) {
-  const iconUrl = isOpen ? arrowUpIconUrl : arrowDownIconUrl
-  const style = {
-    WebkitMaskImage: `url(${iconUrl})`,
-    maskImage: `url(${iconUrl})`,
-  } satisfies CSSProperties
-
   return (
     <span
       aria-hidden="true"
-      className={className}
-      style={style}
-    />
+      className={`${className} ${
+        isOpen ? "bsu-chevron-open" : "bsu-chevron-closed"
+      }`}>
+      <span />
+    </span>
   )
 }
 

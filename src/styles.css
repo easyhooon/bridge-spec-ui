@@ -285,15 +285,29 @@ body {
 }
 
 .bsu-chevron {
-  display: inline-block;
+  display: inline-flex;
   flex-shrink: 0;
-  width: 20px;
-  height: 20px;
-  background-color: currentColor;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
   color: #475569;
-  mask-position: center;
-  mask-repeat: no-repeat;
-  mask-size: contain;
+}
+
+.bsu-chevron > span {
+  width: 8px;
+  height: 8px;
+  border-right: 2px solid currentColor;
+  border-bottom: 2px solid currentColor;
+  transition: transform 160ms ease;
+}
+
+.bsu-chevron.bsu-chevron-open > span {
+  transform: translateY(-1px) rotate(225deg);
+}
+
+.bsu-chevron.bsu-chevron-closed > span {
+  transform: translateY(-2px) rotate(45deg);
 }
 
 .bsu-operation-body {
@@ -600,15 +614,29 @@ body {
 }
 
 .bsu-schema-chevron {
-  display: inline-block;
+  display: inline-flex;
   flex-shrink: 0;
-  width: 20px;
-  height: 20px;
-  background-color: currentColor;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
   color: #333;
-  mask-position: center;
-  mask-repeat: no-repeat;
-  mask-size: contain;
+}
+
+.bsu-schema-chevron > span {
+  width: 6px;
+  height: 6px;
+  border-right: 2px solid currentColor;
+  border-bottom: 2px solid currentColor;
+  transition: transform 160ms ease;
+}
+
+.bsu-schema-chevron.bsu-chevron-open > span {
+  transform: translateY(1px) rotate(225deg);
+}
+
+.bsu-schema-chevron.bsu-chevron-closed > span {
+  transform: rotate(-45deg);
 }
 
 .bsu-schema-type {
