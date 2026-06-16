@@ -9,7 +9,11 @@ that can render those specs.
 
 ## Development
 
-Clone the repository and install npm dependencies first:
+This repository uses `pnpm` for local development. Keep `pnpm-lock.yaml` as the
+single lockfile for the repo and avoid mixing in `package-lock.json` or
+`yarn.lock`.
+
+Clone the repository and install dependencies first:
 
 ```bash
 git clone https://github.com/easyhooon/bridge-spec-ui.git
@@ -52,13 +56,18 @@ pnpm build
 
 ## Package Installation
 
-BridgeSpec UI is not published to npm yet.
-
-After the first package release, install it from npm:
+BridgeSpec UI is a React/TypeScript package distributed through the npm
+registry. Consumers can use whichever package manager their app already uses:
 
 ```bash
 pnpm add bridge-spec-ui zod
+npm install bridge-spec-ui zod
+yarn add bridge-spec-ui zod
 ```
+
+Use `npm`, `yarn`, or `pnpm` for installing dependencies into an app. `npx` is
+for running CLI commands temporarily, so it is not the right tool for installing
+BridgeSpec UI as an application dependency.
 
 To try the package from another local app before publishing, build and pack it
 from this repository:
@@ -72,7 +81,7 @@ pnpm pack --pack-destination /tmp
 Then install the generated tarball from the other app:
 
 ```bash
-pnpm add /tmp/bridge-spec-ui-0.0.0.tgz zod
+pnpm add /tmp/bridge-spec-ui-0.1.0.tgz zod
 ```
 
 ## Quick Start

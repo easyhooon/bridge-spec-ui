@@ -1,10 +1,26 @@
 {
   "name": "bridge-spec-ui",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "Swagger UI-style documentation and testing components for WebView bridge APIs.",
   "type": "module",
   "types": "./dist/index.d.ts",
   "license": "MIT",
+  "homepage": "https://github.com/easyhooon/bridge-spec-ui#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/easyhooon/bridge-spec-ui.git"
+  },
+  "bugs": {
+    "url": "https://github.com/easyhooon/bridge-spec-ui/issues"
+  },
+  "keywords": [
+    "webview",
+    "bridge",
+    "documentation",
+    "swagger-ui",
+    "react",
+    "zod"
+  ],
   "sideEffects": [
     "dist/styles.css",
     "src/styles.css"
