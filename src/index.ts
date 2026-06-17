@@ -1,3 +1,3 @@
-export * from "./components/BridgeSpecUi"
+export * from "./components/BridgeDocs"
 export * from "./core"
 import "./styles.css"

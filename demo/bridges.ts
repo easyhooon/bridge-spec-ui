@@ -1,10 +1,7 @@
 import { z } from "zod"
-import {
-  defineAppToWebBridge,
-  defineWebToAppBridge,
-  type BridgePlatform,
-  type BridgeRunner,
-} from "../core"
+
+// allow: SIZE_OK - demo bridge catalog; static sample specs are kept together for scanability.
+import { defineAppToWebBridge, defineWebToAppBridge } from "../src/core"
 
 const permissionNameSchema = z.enum([
   "notifications",
@@ -149,7 +146,7 @@ export const demoTagOrder = [
   "App Info / Device",
   "Permissions",
   "Secure Storage",
-  "Native UI",
+  "Native Screens",
   "Navigation",
   "Commerce",
   "Sync / Network",
@@ -162,7 +159,8 @@ export const demoBridges = [
   defineWebToAppBridge({
     handlerName: "getNativeAppInfo",
     title: "Native app info",
-    summary: "Requests host app version, build number, environment, and platform.",
+    summary:
+      "Requests host app version, build number, environment, and platform.",
     tags: ["App Info / Device"],
     platforms: ["android", "ios"],
     response: z.object({
@@ -186,7 +184,8 @@ export const demoBridges = [
   defineWebToAppBridge({
     handlerName: "getDeviceContext",
     title: "Device context",
-    summary: "Reads device identity, model, locale, timezone, theme, and battery.",
+    summary:
+      "Reads device identity, model, locale, timezone, theme, and battery.",
     tags: ["App Info / Device"],
     platforms: ["android", "ios"],
     response: z.object({
@@ -348,7 +347,7 @@ export const demoBridges = [
     handlerName: "pickImage",
     title: "Pick image",
     summary: "Opens native image picker and returns selected asset metadata.",
-    tags: ["Native UI"],
+    tags: ["Native Screens"],
     platforms: ["android", "ios"],
     request: z.object({
       source: z.enum(["camera", "photo-library"]),
@@ -394,7 +393,7 @@ export const demoBridges = [
     handlerName: "scanCode",
     title: "Scan QR or barcode",
     summary: "Opens a native scanner and returns the decoded payload.",
-    tags: ["Native UI"],
+    tags: ["Native Screens"],
     platforms: ["android", "ios"],
     request: z.object({
       formats: z.array(z.enum(["qr", "ean13", "code128"])),
@@ -420,7 +419,7 @@ export const demoBridges = [
     handlerName: "shareText",
     title: "Share text",
     summary: "Opens a native share sheet with a text payload.",
-    tags: ["Native UI"],
+    tags: ["Native Screens"],
     platforms: ["android", "ios"],
     request: z.object({
       title: z.string().optional(),
@@ -435,7 +434,7 @@ export const demoBridges = [
       {
         title: "Share message",
         data: {
-          title: "BridgeSpec UI",
+          title: "BridgeDocs",
           text: "Testing a WebView bridge.",
           url: "https://example.com",
         },
@@ -444,7 +443,8 @@ export const demoBridges = [
     ],
     tryOut: {
       mode: "mock-only",
-      reason: "The sample returns a fake share result instead of opening a sheet.",
+      reason:
+        "The sample returns a fake share result instead of opening a sheet.",
     },
   }),
   defineWebToAppBridge({
@@ -557,7 +557,8 @@ export const demoBridges = [
   defineWebToAppBridge({
     handlerName: "registerPushToken",
     title: "Register push token",
-    summary: "Requests a native push token and reports whether push is enabled.",
+    summary:
+      "Requests a native push token and reports whether push is enabled.",
     tags: ["Push / Notifications"],
     platforms: ["android", "ios"],
     response: z.object({
@@ -723,186 +724,3 @@ export const demoBridges = [
     },
   }),
 ]
-
-function getPlatformProfile(
-  state: DemoNativeState,
-  platform: BridgePlatform,
-) {
-  return platform === "ios" ? state.platforms.ios : state.platforms.android
-}
-
-export function createDemoRunner({
-  getNativeState,
-}: {
-  getNativeState: () => DemoNativeState
-}): BridgeRunner {
-  return async ({ bridge, data, platform }) => {
-    const nativeState = getNativeState()
-    const platformProfile = getPlatformProfile(nativeState, platform)
-
-    if (bridge.tryOut?.mode === "disabled") {
-      return {
-        ok: false,
-        message: bridge.tryOut.reason ?? "This bridge is disabled.",
-        payload: null,
-      }
-    }
-
-    if (bridge.tryOut?.mode === "mock-only") {
-      const response = bridge.examples.find(
-        (example) => example.response !== undefined,
-      )?.response
-
-      return {
-        ok: true,
-        message: "Sample mock response returned.",
-        payload: response ?? null,
-      }
-    }
-
-    switch (bridge.handlerName) {
-      case "getNativeAppInfo":
-        return {
-          ok: true,
-          message: "Native app info resolved from sample state.",
-          payload: {
-            platform,
-            appVersion: nativeState.app.version,
-            buildNumber: nativeState.app.buildNumber,
-            environment: nativeState.app.environment,
-          },
-        }
-      case "getDeviceContext":
-        return {
-          ok: true,
-          message: "Device context resolved from sample state.",
-          payload: {
-            deviceId: nativeState.device.id,
-            modelName: platformProfile.modelName,
-            osVersion: platformProfile.osVersion,
-            locale: nativeState.device.locale,
-            timezone: nativeState.device.timezone,
-            theme: nativeState.device.theme,
-            batteryLevel: nativeState.device.batteryLevel,
-          },
-        }
-      case "getSafeAreaInsets":
-        return {
-          ok: true,
-          message: "Safe area insets resolved from sample state.",
-          payload: nativeState.device.safeAreaInsets,
-        }
-      case "getPermissionStatus": {
-        const permissionName = (data as { name: DemoPermissionName }).name
-
-        return {
-          ok: true,
-          message: "Permission state resolved from sample state.",
-          payload: {
-            name: permissionName,
-            granted: nativeState.permissions[permissionName],
-          },
-        }
-      }
-      case "requestPermission": {
-        const permissionName = (data as { name: DemoPermissionName }).name
-        const granted = nativeState.permissions[permissionName]
-
-        return {
-          ok: true,
-          message: granted
-            ? "Sample permission request granted."
-            : "Sample permission request denied.",
-          payload: {
-            name: permissionName,
-            granted,
-            reason: granted ? "GRANTED" : "DENIED",
-          },
-        }
-      }
-      case "authenticateWithBiometrics":
-        return {
-          ok: nativeState.permissions.biometrics,
-          message:
-            nativeState.permissions.biometrics &&
-            nativeState.account.biometricsEnrolled
-              ? "Sample biometric authentication succeeded."
-              : "Sample biometric authentication failed.",
-          payload: {
-            authenticated:
-              nativeState.permissions.biometrics &&
-              nativeState.account.biometricsEnrolled,
-            reason:
-              nativeState.permissions.biometrics &&
-              nativeState.account.biometricsEnrolled
-                ? "OK"
-                : "NOT_ENROLLED",
-          },
-        }
-      case "getSecureItem": {
-        const key = (data as { key: DemoSecureStorageKey }).key
-
-        return {
-          ok: true,
-          message: "Secure storage value resolved from sample state.",
-          payload: {
-            key,
-            value: nativeState.secureStorage[key],
-          },
-        }
-      }
-      case "presentNativeCheckout":
-        return {
-          ok: nativeState.checkout.canPay,
-          message: nativeState.checkout.canPay
-            ? "Sample checkout paid."
-            : "Sample checkout failed.",
-          payload: {
-            status: nativeState.checkout.canPay ? "PAID" : "FAILED",
-            transactionId: nativeState.checkout.canPay
-              ? nativeState.checkout.lastTransactionId
-              : null,
-          },
-        }
-      case "syncOfflineQueue":
-        return {
-          ok: nativeState.network.online,
-          message: nativeState.network.online
-            ? "Sample offline queue synced."
-            : "Sample native host is offline.",
-          payload: {
-            status: nativeState.network.online ? "SYNCED" : "OFFLINE",
-            syncedAt: nativeState.network.online
-              ? nativeState.sync.lastSyncedAt
-              : null,
-            recordsUploaded: nativeState.network.online
-              ? nativeState.sync.queuedRecords
-              : 0,
-          },
-        }
-      case "getConnectivity":
-        return {
-          ok: true,
-          message: "Connectivity resolved from sample state.",
-          payload: nativeState.network,
-        }
-      case "registerPushToken":
-        return {
-          ok: nativeState.push.enabled,
-          message: nativeState.push.enabled
-            ? "Sample push token returned."
-            : "Sample push registration is disabled.",
-          payload: {
-            token: nativeState.push.enabled ? nativeState.push.token : null,
-            enabled: nativeState.push.enabled,
-          },
-        }
-      default:
-        return {
-          ok: false,
-          message: "No sample runner is attached to this bridge.",
-          payload: data,
-        }
-    }
-  }
-}

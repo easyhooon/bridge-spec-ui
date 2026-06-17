@@ -1,10 +1,10 @@
-# BridgeSpec UI
+# BridgeDocs
 
-Swagger UI-style documentation and testing components for WebView bridge APIs.
+Swagger-style documentation and testing components for WebView bridge APIs.
 
-BridgeSpec UI is intentionally app-agnostic. Your app owns the actual bridge
+BridgeDocs is intentionally app-agnostic. Your app owns the actual bridge
 runtime, mock native behavior, themes, routes, and handler implementation. This
-package gives you a small source-of-truth API for bridge specs and a React UI
+package gives you a small source-of-truth API for bridge specs and a React docs surface
 that can render those specs.
 
 ## Development
@@ -16,8 +16,8 @@ single lockfile for the repo and avoid mixing in `package-lock.json` or
 Clone the repository and install dependencies first:
 
 ```bash
-git clone https://github.com/easyhooon/bridge-spec-ui.git
-cd bridge-spec-ui
+git clone https://github.com/easyhooon/bridge-docs.git
+cd bridge-docs
 pnpm install
 ```
 
@@ -54,20 +54,26 @@ pnpm typecheck
 pnpm build
 ```
 
+### Project Structure
+
+- `src/core`: bridge definition types, schema helpers, and source-of-truth APIs
+- `src/components/BridgeDocs`: package components and docs rendering internals
+- `demo`: local Vite sample app and mock native bridge catalog
+
 ## Package Installation
 
-BridgeSpec UI is a React/TypeScript package distributed through the npm
+BridgeDocs is a React/TypeScript package distributed through the npm
 registry. Consumers can use whichever package manager their app already uses:
 
 ```bash
-pnpm add bridge-spec-ui zod
-npm install bridge-spec-ui zod
-yarn add bridge-spec-ui zod
+pnpm add bridge-docs zod
+npm install bridge-docs zod
+yarn add bridge-docs zod
 ```
 
 Use `npm`, `yarn`, or `pnpm` for installing dependencies into an app. `npx` is
 for running CLI commands temporarily, so it is not the right tool for installing
-BridgeSpec UI as an application dependency.
+BridgeDocs as an application dependency.
 
 To try the package from another local app before publishing, build and pack it
 from this repository:
@@ -81,19 +87,19 @@ pnpm pack --pack-destination /tmp
 Then install the generated tarball from the other app:
 
 ```bash
-pnpm add /tmp/bridge-spec-ui-0.1.0.tgz zod
+pnpm add /tmp/bridge-docs-0.1.0.tgz zod
 ```
 
 ## Quick Start
 
 ```tsx
 import {
-  BridgeSpecUi,
+  BridgeDocs,
   defineWebToAppBridge,
   type BridgeTryResult,
   type BridgePlatform,
-} from "bridge-spec-ui"
-import "bridge-spec-ui/styles.css"
+} from "bridge-docs"
+import "bridge-docs/styles.css"
 import { useState } from "react"
 import { z } from "zod"
 
@@ -122,7 +128,7 @@ function App() {
   const [platform, setPlatform] = useState<BridgePlatform>("android")
 
   return (
-    <BridgeSpecUi
+    <BridgeDocs
       title="Example WebView Bridge"
       bridges={[getNativeAppVersion]}
       platform={platform}
@@ -158,7 +164,7 @@ The local demo app shows a production-shaped integration:
 - Android/iOS platform switching
 - mock native state controls for app, device, network, permissions, secure
   storage, push, and checkout scenarios
-- permission, secure storage, native UI, navigation, commerce, sync, push, and
+- permission, secure storage, native screens, navigation, commerce, sync, push, and
   lifecycle examples
 - mock-only and disabled Try it out policies
 
@@ -198,7 +204,7 @@ pnpm build
 
 - `defineWebToAppBridge` and `defineAppToWebBridge` keep handler names, runtime
   schemas, examples, and optional invoke functions together.
-- BridgeSpec UI does not know app-specific user agents, permission state,
+- BridgeDocs does not know app-specific user agents, permission state,
   native state, or request envelopes. Pass those through adapters from the host
   app.
 - The first migration target should be a few safe Web -> App bridges, then mock

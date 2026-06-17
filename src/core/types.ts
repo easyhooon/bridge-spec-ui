@@ -58,11 +58,15 @@ export type DefineBridgeInput<TData = unknown, TResult = unknown> = {
   invoke?: BridgeInvoke<TData, TResult>
 }
 
-export type DefineWebToAppBridgeInput<TData = unknown, TResult = unknown> =
-  Omit<DefineBridgeInput<TData, TResult>, "direction">
+export type DefineWebToAppBridgeInput<
+  TData = unknown,
+  TResult = unknown,
+> = Omit<DefineBridgeInput<TData, TResult>, "direction">
 
-export type DefineAppToWebBridgeInput<TData = unknown, TResult = unknown> =
-  Omit<DefineBridgeInput<TData, TResult>, "direction">
+export type DefineAppToWebBridgeInput<
+  TData = unknown,
+  TResult = unknown,
+> = Omit<DefineBridgeInput<TData, TResult>, "direction">
 
 export type BridgeTryContext<TData = unknown> = {
   bridge: AnyBridgeSpec
@@ -80,12 +84,12 @@ export type BridgeRunner = (
   context: BridgeTryContext,
 ) => Promise<BridgeTryResult> | BridgeTryResult
 
-export type BridgeSpecUiMockPanelContext = {
+export type BridgeDocsMockPanelContext = {
   visibleBridges: AnyBridgeSpec[]
   selectedPlatform: BridgePlatform
 }
 
-export type BridgeSpecUiProps = {
+export type BridgeDocsProps = {
   title: string
   description?: string
   bridges: AnyBridgeSpec[]
@@ -102,7 +106,5 @@ export type BridgeSpecUiProps = {
   iconHref?: string
   queryPlaceholder?: string
   tagOrder?: string[]
-  renderEnvironmentPanel?: (
-    context: BridgeSpecUiMockPanelContext,
-  ) => ReactNode
+  renderEnvironmentPanel?: (context: BridgeDocsMockPanelContext) => ReactNode
 }
